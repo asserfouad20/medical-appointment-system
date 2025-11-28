@@ -47,16 +47,21 @@
 
     <script src="js/app.js"></script>
     <script>
+        // Track which type of user is trying to log in (patient, doctor, or admin)
+        // Default is patient since that's most common
         let selectedUserType = 'patient';
 
-        // Handle user type selection
+        // Handle clicking on the user type buttons (Patient/Doctor/Admin)
         document.querySelectorAll('.user-type-btn').forEach(btn => {
             btn.addEventListener('click', function() {
+                // Remove active class from all buttons first
                 document.querySelectorAll('.user-type-btn').forEach(b => b.classList.remove('active'));
+                // Then add it to the clicked button
                 this.classList.add('active');
                 selectedUserType = this.dataset.type;
 
-                // Show/hide patient registration link
+                // Show patient-specific options (registration link) only when patient is selected
+                // Doctors and admins don't need to register themselves
                 const patientOptions = document.getElementById('patientOptions');
                 if (selectedUserType === 'patient') {
                     patientOptions.style.display = 'block';
@@ -66,17 +71,20 @@
             });
         });
 
-        // Handle login form submission
+        // Handle the login form when user clicks "Login"
         document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Stop the form from actually submitting
 
+            // Get what the user typed in, convert email to lowercase for consistency
             const email = document.getElementById('email').value.toLowerCase().trim();
             const password = document.getElementById('password').value;
 
-            let user = null;
+            let user = null; // Will hold the found user if credentials match
             let userType = selectedUserType;
 
-            // Find user based on selected type (case-insensitive email)
+            // Search for the user in the appropriate list based on selected type
+            // We check both email and name to make login more flexible
+            // Password must match exactly though (in a real app, this would be hashed!)
             if (selectedUserType === 'patient') {
                 user = mockData.patients.find(p =>
                     (p.email.toLowerCase() === email || p.name.toLowerCase() === email.toLowerCase()) && p.password === password
@@ -91,11 +99,12 @@
                 );
             }
 
+            // If we found a matching user, log them in!
             if (user) {
-                // Set current user with type
+                // Save the user to session storage with their type
                 utils.setCurrentUser({ ...user, type: userType });
 
-                // Redirect based on user type
+                // Send them to the right dashboard based on their role
                 if (userType === 'patient') {
                     window.location.href = 'pages/patient-dashboard.html';
                 } else if (userType === 'doctor') {
@@ -104,6 +113,7 @@
                     window.location.href = 'pages/admin-dashboard.html';
                 }
             } else {
+                // No matching user found - show error message
                 showToast('Invalid credentials. Please try again.', 'error');
             }
         });
