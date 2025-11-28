@@ -102,6 +102,48 @@
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Prevent booking appointments in the past
+            const appointmentDate = new Date(date);
+            appointmentDate.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (appointmentDate < today) {
+                showToast('Cannot book appointments for past dates.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'doctor-list.html';
+                }, 1500);
+                return;
+            }
+
+            // Validate patient age
+            const patient = utils.getPatientById(currentUser.id);
+            if (patient && patient.dob) {
+                const birthDate = new Date(patient.dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                // Check if patient is under 12
+                if (age < 12) {
+                    showToast('Patients under 12 years old cannot book appointments. Please contact the hospital directly.', 'error');
+                    return;
+                }
+
+                // Check if patient is under 16 and doesn't have guardian info
+                if (age < 16 && (!patient.guardianName || !patient.guardianPhone)) {
+                    showToast('Patients under 16 require a parent or guardian. Please update your profile with guardian information.', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'patient-profile.html';
+                    }, 2000);
+                    return;
+                }
+            }
+
             const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
             const notes = document.getElementById('notes').value;
 
@@ -118,7 +160,7 @@
                 window.location.href = 'payment.html';
             } else {
                 // Book appointment directly
-                const appointment = utils.bookAppointment({
+                const result = utils.bookAppointment({
                     patientId: currentUser.id,
                     doctorId: doctor.id,
                     date: date,
@@ -127,10 +169,14 @@
                     notes: notes
                 });
 
-                showToast('Appointment booked successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'my-appointments.html';
-                }, 1500);
+                if (result.error) {
+                    showToast(result.error, 'error');
+                } else {
+                    showToast('Appointment booked successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'my-appointments.html';
+                    }, 1500);
+                }
             }
         });
 

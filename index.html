@@ -39,7 +39,7 @@
             <div id="demoCredentials" class="alert alert-info mt-3">
                 <strong>Demo Credentials:</strong><br>
                 Patient: patient@test.com / patient123<br>
-                Doctor: sarah@hospital.com / doctor123<br>
+                Doctor: doctor@test.com / doctor123<br>
                 Admin: admin@hospital.com / admin123
             </div>
         </div>
@@ -70,24 +70,24 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.toLowerCase().trim();
             const password = document.getElementById('password').value;
 
             let user = null;
             let userType = selectedUserType;
 
-            // Find user based on selected type
+            // Find user based on selected type (case-insensitive email)
             if (selectedUserType === 'patient') {
                 user = mockData.patients.find(p =>
-                    (p.email === email || p.name === email) && p.password === password
+                    (p.email.toLowerCase() === email || p.name.toLowerCase() === email.toLowerCase()) && p.password === password
                 );
             } else if (selectedUserType === 'doctor') {
                 user = mockData.doctors.find(d =>
-                    (d.email === email || d.name === email) && d.password === password
+                    (d.email.toLowerCase() === email || d.name.toLowerCase() === email.toLowerCase()) && d.password === password
                 );
             } else if (selectedUserType === 'admin') {
                 user = mockData.admins.find(a =>
-                    (a.email === email || a.name === email) && a.password === password
+                    (a.email.toLowerCase() === email || a.name.toLowerCase() === email.toLowerCase()) && a.password === password
                 );
             }
 

@@ -44,9 +44,15 @@
                     <input type="date" id="dob" class="form-control" required>
                 </div>
 
+                <div class="form-group" id="ageWarning" style="display: none;">
+                    <div class="alert alert-danger">
+                        Patients under 12 years old cannot register online. Please contact the hospital directly.
+                    </div>
+                </div>
+
                 <div class="form-group" id="guardianSection" style="display: none;">
                     <div class="alert alert-info">
-                        Patient is under 16 years old. A parent or guardian must complete the booking.
+                        Patient is between 12-15 years old. A parent or guardian is required for appointments.
                     </div>
                     <label class="form-label" for="guardianName">Parent/Guardian Full Name</label>
                     <input type="text" id="guardianName" class="form-control">
@@ -59,8 +65,10 @@
                     document.addEventListener('DOMContentLoaded', function() {
                         const dobInput = document.getElementById('dob');
                         const guardianSection = document.getElementById('guardianSection');
+                        const ageWarning = document.getElementById('ageWarning');
                         const guardianName = document.getElementById('guardianName');
                         const guardianPhone = document.getElementById('guardianPhone');
+                        const registerBtn = document.querySelector('button[type="submit"]');
 
                         // Set min date to 1900-01-01 and max date to today
                         const today = new Date().toISOString().split('T')[0];
@@ -78,14 +86,24 @@
                                 age--;
                             }
 
-                            if (age < 16) {
+                            // Reset all sections
+                            guardianSection.style.display = 'none';
+                            ageWarning.style.display = 'none';
+                            guardianName.required = false;
+                            guardianPhone.required = false;
+                            registerBtn.disabled = false;
+
+                            if (age < 12) {
+                                // Under 12: Show warning and disable registration
+                                ageWarning.style.display = 'block';
+                                registerBtn.disabled = true;
+                            } else if (age < 16) {
+                                // Between 12-15: Require guardian info
                                 guardianSection.style.display = 'block';
                                 guardianName.required = true;
                                 guardianPhone.required = true;
                             } else {
-                                guardianSection.style.display = 'none';
-                                guardianName.required = false;
-                                guardianPhone.required = false;
+                                // 16 and above: Normal registration
                                 guardianName.value = '';
                                 guardianPhone.value = '';
                             }

@@ -71,9 +71,16 @@
 
         const currentUser = utils.getCurrentUser();
         const appointments = utils.getPatientAppointments(currentUser.id);
-        const pastAppointments = appointments.filter(apt =>
-            apt.status === 'done' || apt.status === 'cancelled' || new Date(apt.date) < new Date()
-        ).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Get today's date at midnight for accurate comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const pastAppointments = appointments.filter(apt => {
+            const appointmentDate = new Date(apt.date);
+            appointmentDate.setHours(0, 0, 0, 0);
+            return apt.status === 'done' || apt.status === 'cancelled' || appointmentDate < today;
+        }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
         const container = document.getElementById('historyList');
 

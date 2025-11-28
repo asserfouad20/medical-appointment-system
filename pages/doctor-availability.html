@@ -85,13 +85,24 @@
         document.getElementById('doctorBio').textContent = doctor.bio || 'Experienced medical professional';
         document.getElementById('doctorPhone').textContent = doctor.phone;
 
-        // Display availability
+        // Display availability - filter out past dates
         const availabilityContainer = document.getElementById('availabilityContainer');
 
-        if (doctor.availability && doctor.availability.length > 0) {
+        // Get today's date at midnight for accurate comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Filter availability to only show future dates
+        const futureAvailability = doctor.availability.filter(dateSlot => {
+            const slotDate = new Date(dateSlot.date);
+            slotDate.setHours(0, 0, 0, 0);
+            return slotDate >= today && dateSlot.slots.length > 0;
+        });
+
+        if (futureAvailability && futureAvailability.length > 0) {
             availabilityContainer.innerHTML = '';
 
-            doctor.availability.forEach(dateSlot => {
+            futureAvailability.forEach(dateSlot => {
                 const dateCard = document.createElement('div');
                 dateCard.style.marginBottom = '24px';
 

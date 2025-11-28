@@ -315,7 +315,6 @@ body > * {
 }
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 .btn-primary:active {
@@ -329,7 +328,6 @@ body > * {
 }
 .btn-secondary:hover {
     background: linear-gradient(135deg, var(--accent-blue) 0%, var(--secondary-color) 100%);
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 .btn-danger {
@@ -339,7 +337,6 @@ body > * {
 }
 .btn-danger:hover {
     background: linear-gradient(135deg, #d43f5f 0%, var(--danger-color) 100%);
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 .btn-outline {
@@ -351,7 +348,6 @@ body > * {
 .btn-outline:hover {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 .btn-block {
@@ -740,7 +736,7 @@ body > * {
 }
 .time-slot:hover {
     border-color: var(--primary-color);
-    transform: translateY(-4px) scale(1.05);
+    transform: scale(1.02);
     box-shadow: var(--shadow);
 }
 .time-slot.selected {
@@ -980,7 +976,6 @@ body > * {
 .user-type-btn:hover {
     border-color: var(--primary-color);
     background: var(--bg-light);
-    transform: translateY(-4px);
     box-shadow: var(--shadow);
 }
 .user-type-btn.active {

@@ -113,6 +113,36 @@
         document.getElementById('paymentForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Get current user and validate age
+            const currentUser = utils.getCurrentUser();
+            const patient = utils.getPatientById(currentUser.id);
+
+            if (patient && patient.dob) {
+                const birthDate = new Date(patient.dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                // Check if patient is under 12
+                if (age < 12) {
+                    showToast('Patients under 12 years old cannot book appointments. Please contact the hospital directly.', 'error');
+                    return;
+                }
+
+                // Check if patient is under 16 and doesn't have guardian info
+                if (age < 16 && (!patient.guardianName || !patient.guardianPhone)) {
+                    showToast('Patients under 16 require a parent or guardian. Please update your profile with guardian information.', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'patient-profile.html';
+                    }, 2000);
+                    return;
+                }
+            }
+
             // Validate card number is exactly 16 digits
             const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
             if (cardNumber.length !== 16) {
@@ -131,15 +161,24 @@
             const appointmentData = JSON.parse(pendingAppointment);
 
             // Book the appointment
-            utils.bookAppointment(appointmentData);
+            const result = utils.bookAppointment(appointmentData);
 
-            // Clear pending appointment
-            sessionStorage.removeItem('pendingAppointment');
+            if (result.error) {
+                showToast(result.error, 'error');
+                // Clear pending appointment on error
+                sessionStorage.removeItem('pendingAppointment');
+                setTimeout(() => {
+                    window.location.href = 'doctor-list.html';
+                }, 2000);
+            } else {
+                // Clear pending appointment
+                sessionStorage.removeItem('pendingAppointment');
 
-            showToast('Payment successful! Your appointment has been booked.', 'success');
-            setTimeout(() => {
-                window.location.href = 'my-appointments.html';
-            }, 1500);
+                showToast('Payment successful! Your appointment has been booked.', 'success');
+                setTimeout(() => {
+                    window.location.href = 'my-appointments.html';
+                }, 1500);
+            }
         });
 
         document.getElementById('logoutBtn').addEventListener('click', (e) => {

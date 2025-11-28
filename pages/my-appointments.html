@@ -54,9 +54,16 @@
 
         const currentUser = utils.getCurrentUser();
         const appointments = utils.getPatientAppointments(currentUser.id);
-        const upcomingAppointments = appointments.filter(apt =>
-            apt.status === 'booked' && new Date(apt.date) >= new Date()
-        ).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // Get today's date at midnight for accurate comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcomingAppointments = appointments.filter(apt => {
+            const appointmentDate = new Date(apt.date);
+            appointmentDate.setHours(0, 0, 0, 0);
+            return apt.status === 'booked' && appointmentDate >= today;
+        }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
         const container = document.getElementById('appointmentsList');
 

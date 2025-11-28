@@ -1,3 +1,15 @@
+// Helper function to generate future dates
+function getFutureDates() {
+    const dates = [];
+    const today = new Date();
+    for (let i = 1; i <= 7; i++) {
+        const futureDate = new Date(today);
+        futureDate.setDate(today.getDate() + i);
+        dates.push(futureDate.toISOString().split('T')[0]);
+    }
+    return dates;
+}
+
 const mockData = {
     currentUser: null,
     patients: [
@@ -14,60 +26,72 @@ const mockData = {
     doctors: [
         {
             id: 1,
-            name: "Dr. Sarah Wilson",
-            email: "sarah@hospital.com",
+            name: "Dr. Asser Fouad",
+            email: "doctor@test.com",
             password: "doctor123",
             specialty: "Cardiology",
             phone: "555-0201",
             rating: 4.8,
             bio: "Experienced cardiologist with 15 years of practice.",
-            availability: [
-                { date: "2025-11-22", slots: ["09:00", "10:00", "11:00", "14:00", "15:00"] },
-                { date: "2025-11-23", slots: ["09:00", "10:00", "13:00", "14:00"] },
-                { date: "2025-11-25", slots: ["10:00", "11:00", "15:00", "16:00"] }
-            ]
+            availability: (() => {
+                const dates = getFutureDates();
+                return [
+                    { date: dates[0], slots: ["09:00", "10:00", "11:00", "14:00", "15:00"] },
+                    { date: dates[1], slots: ["09:00", "10:00", "13:00", "14:00"] },
+                    { date: dates[3], slots: ["10:00", "11:00", "15:00", "16:00"] }
+                ];
+            })()
         },
         {
             id: 2,
-            name: "Dr. Michael Chen",
-            email: "michael@hospital.com",
+            name: "Dr. Noor Ihab",
+            email: "doctor@test.com",
             password: "doctor123",
             specialty: "Dermatology",
             phone: "555-0202",
             rating: 4.9,
             bio: "Board-certified dermatologist specializing in cosmetic procedures.",
-            availability: [
-                { date: "2025-11-22", slots: ["10:00", "11:00", "14:00", "15:00", "16:00"] },
-                { date: "2025-11-24", slots: ["09:00", "10:00", "11:00"] }
-            ]
+            availability: (() => {
+                const dates = getFutureDates();
+                return [
+                    { date: dates[0], slots: ["10:00", "11:00", "14:00", "15:00", "16:00"] },
+                    { date: dates[2], slots: ["09:00", "10:00", "11:00"] }
+                ];
+            })()
         },
         {
             id: 3,
-            name: "Dr. Emily Brown",
-            email: "emily@hospital.com",
+            name: "Dr. Mohamed Mostafa",
+            email: "doctor@test.com",
             password: "doctor123",
             specialty: "Pediatrics",
             phone: "555-0203",
             rating: 4.7,
             bio: "Pediatrician with a passion for children's health.",
-            availability: [
-                { date: "2025-11-23", slots: ["09:00", "10:00", "11:00", "13:00", "14:00"] },
-                { date: "2025-11-25", slots: ["09:00", "10:00", "15:00"] }
-            ]
+            availability: (() => {
+                const dates = getFutureDates();
+                return [
+                    { date: dates[1], slots: ["09:00", "10:00", "11:00", "13:00", "14:00"] },
+                    { date: dates[3], slots: ["09:00", "10:00", "15:00"] }
+                ];
+            })()
         },
         {
             id: 4,
-            name: "Dr. James Taylor",
-            email: "james@hospital.com",
+            name: "Dr. Mohannad Hamouda",
+            email: "doctor@test.com",
             password: "doctor123",
             specialty: "Orthopedics",
             phone: "555-0204",
             rating: 4.6,
             bio: "Orthopedic surgeon with expertise in sports injuries.",
-            availability: [
-                { date: "2025-11-22", slots: ["09:00", "13:00", "14:00"] },
-                { date: "2025-11-24", slots: ["10:00", "11:00", "14:00", "15:00"] }
-            ]
+            availability: (() => {
+                const dates = getFutureDates();
+                return [
+                    { date: dates[0], slots: ["09:00", "13:00", "14:00"] },
+                    { date: dates[2], slots: ["10:00", "11:00", "14:00", "15:00"] }
+                ];
+            })()
         }
     ],
     admins: [
@@ -78,19 +102,7 @@ const mockData = {
             password: "admin123"
         }
     ],
-    appointments: [
-        {
-            id: 1,
-            patientId: 1,
-            doctorId: 1,
-            date: "2025-11-22",
-            time: "10:00",
-            status: "booked",
-            paymentMethod: "cash",
-            notes: "",
-            rating: null
-        }
-    ]
+    appointments: []
 };
 const utils = {
     saveData: function() {
@@ -101,6 +113,45 @@ const utils = {
         if (data) {
             Object.assign(mockData, JSON.parse(data));
         }
+        // Update availability dates to ensure they're always in the future
+        this.updateDoctorAvailabilityDates();
+    },
+    updateDoctorAvailabilityDates: function() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        mockData.doctors.forEach(doctor => {
+            // Filter out past dates
+            doctor.availability = doctor.availability.filter(slot => {
+                const slotDate = new Date(slot.date);
+                slotDate.setHours(0, 0, 0, 0);
+                return slotDate >= today;
+            });
+
+            // If doctor has less than 3 availability slots, add more future dates
+            if (doctor.availability.length < 3) {
+                const futureDates = getFutureDates();
+                const existingDates = doctor.availability.map(slot => slot.date);
+
+                // Default time slots
+                const defaultSlots = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00"];
+
+                // Add new dates that don't exist yet
+                let addedCount = 0;
+                for (let i = 0; i < futureDates.length && doctor.availability.length < 5; i++) {
+                    if (!existingDates.includes(futureDates[i])) {
+                        doctor.availability.push({
+                            date: futureDates[i],
+                            slots: [...defaultSlots]
+                        });
+                        addedCount++;
+                    }
+                }
+
+                // Sort availability by date
+                doctor.availability.sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+        });
     },
     getCurrentUser: function() {
         const userStr = sessionStorage.getItem('currentUser');
@@ -154,6 +205,26 @@ const utils = {
         const appointment = mockData.appointments.find(apt => apt.id === parseInt(appointmentId));
         if (appointment) {
             appointment.status = 'cancelled';
+            appointment.cancelledAt = new Date().toISOString();
+
+            // Release the time slot back to doctor's availability
+            const doctor = this.getDoctorById(appointment.doctorId);
+            if (doctor) {
+                let dateSlot = doctor.availability.find(slot => slot.date === appointment.date);
+                if (!dateSlot) {
+                    // Create new date slot if it doesn't exist
+                    dateSlot = { date: appointment.date, slots: [] };
+                    doctor.availability.push(dateSlot);
+                    // Sort availability by date
+                    doctor.availability.sort((a, b) => new Date(a.date) - new Date(b.date));
+                }
+                // Add time back if not already there
+                if (!dateSlot.slots.includes(appointment.time)) {
+                    dateSlot.slots.push(appointment.time);
+                    dateSlot.slots.sort();
+                }
+            }
+
             this.saveData();
             return true;
         }
@@ -169,13 +240,61 @@ const utils = {
         return false;
     },
     bookAppointment: function(appointmentData) {
+        // Check for duplicate appointments (same patient, doctor, date, and time)
+        const duplicate = mockData.appointments.find(apt =>
+            apt.patientId === appointmentData.patientId &&
+            apt.doctorId === appointmentData.doctorId &&
+            apt.date === appointmentData.date &&
+            apt.time === appointmentData.time &&
+            apt.status === 'booked'
+        );
+
+        if (duplicate) {
+            return { error: 'You already have an appointment with this doctor at this time.' };
+        }
+
+        // Check if patient already has an appointment at the same time on the same date
+        const timeConflict = mockData.appointments.find(apt =>
+            apt.patientId === appointmentData.patientId &&
+            apt.date === appointmentData.date &&
+            apt.time === appointmentData.time &&
+            apt.status === 'booked'
+        );
+
+        if (timeConflict) {
+            return { error: 'You already have another appointment at this time.' };
+        }
+
+        // Generate more realistic appointment ID
+        const timestamp = Date.now();
+        const randomNum = Math.floor(Math.random() * 1000);
+        const appointmentId = parseInt(`${timestamp.toString().slice(-6)}${randomNum}`);
+
         const newAppointment = {
-            id: mockData.appointments.length + 1,
+            id: appointmentId,
             ...appointmentData,
             status: 'booked',
-            rating: null
+            rating: null,
+            bookedAt: new Date().toISOString()
         };
         mockData.appointments.push(newAppointment);
+
+        // Remove the booked time slot from doctor's availability
+        const doctor = this.getDoctorById(appointmentData.doctorId);
+        if (doctor) {
+            const dateSlot = doctor.availability.find(slot => slot.date === appointmentData.date);
+            if (dateSlot) {
+                const timeIndex = dateSlot.slots.indexOf(appointmentData.time);
+                if (timeIndex !== -1) {
+                    dateSlot.slots.splice(timeIndex, 1);
+                    // Remove date slot if no more times available
+                    if (dateSlot.slots.length === 0) {
+                        doctor.availability = doctor.availability.filter(slot => slot.date !== appointmentData.date);
+                    }
+                }
+            }
+        }
+
         this.saveData();
         return newAppointment;
     },
@@ -262,7 +381,7 @@ const utils = {
         };
     },
     registerPatient: function(patientData) {
-        const exists = mockData.patients.find(p => p.email === patientData.email);
+        const exists = mockData.patients.find(p => p.email.toLowerCase() === patientData.email.toLowerCase());
         if (exists) {
             return { success: false, message: "Email already registered" };
         }
