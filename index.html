@@ -30,10 +30,6 @@
 
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
 
-                <div class="auth-link" id="patientOptions">
-                    <p>Don't have an account? <a href="pages/patient-registration.html">Create Patient Account</a></p>
-                    <p><a href="#">Forgot Password?</a></p>
-                </div>
             </form>
 
             <div id="demoCredentials" class="alert alert-info mt-3">
@@ -59,15 +55,6 @@
                 // Then add it to the clicked button
                 this.classList.add('active');
                 selectedUserType = this.dataset.type;
-
-                // Show patient-specific options (registration link) only when patient is selected
-                // Doctors and admins don't need to register themselves
-                const patientOptions = document.getElementById('patientOptions');
-                if (selectedUserType === 'patient') {
-                    patientOptions.style.display = 'block';
-                } else {
-                    patientOptions.style.display = 'none';
-                }
             });
         });
 
