@@ -1,6 +1,11 @@
-# Medical Appointment System - ERD
+# Medical Appointment System - Documentation
 
-This folder contains the Entity Relationship Diagram (ERD) for the Medical Appointment System.
+This folder contains the project documentation and Entity Relationship Diagram (ERD).
+
+## Files
+
+- **ERD.png** - Entity Relationship Diagram showing database structure
+- **Documentation.pdf** - Complete project documentation including team info, problem statement, features, and test cases
 
 ## Database Schema
 
