@@ -305,10 +305,10 @@ location.reload();
 
 ## 👥 Development Team
 
-- **Asser Fouad** - Full Stack Developer
-- **Noor Ihab** - Frontend Developer
-- **Mohamed Mostafa** - Backend Developer
-- **Mohannad Hamouda** - UI/UX Designer
+- **Asser Fouad** - Front-end implementation
+- **Noor Ihab** - ERD + Documentation, Backend (Yet to be done)
+- **Mohamed Mostafa** - Front-end implementatiion
+- **Mohannad Hamouda** - Database
 
 ## 📚 Learning Resources
 
