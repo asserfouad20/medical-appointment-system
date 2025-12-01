@@ -308,7 +308,7 @@ location.reload();
 - **Asser Fouad** - Front-end implementation
 - **Noor Ihab** - ERD + Documentation, Backend (Yet to be done)
 - **Mohamed Mostafa** - Front-end implementatiion
-- **Mohannad Hamouda** - Database
+- **Mohannad Hamouda** - Database (Yet to be done)
 
 ## 📚 Learning Resources
 
