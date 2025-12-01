@@ -37,7 +37,7 @@ const mockData = {
         {
             id: 1,
             name: "Dr. Asser Fouad",
-            email: "doctor@test.com", // All doctors share the same login for simplicity
+            email: "doctor@test.com", // All doctors share the same login until database is done
             password: "doctor123",
             specialty: "Cardiology",
             phone: "555-0201",
